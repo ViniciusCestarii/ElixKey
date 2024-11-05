@@ -2,6 +2,8 @@ defmodule ElixKey.CLITest do
   use ExUnit.Case
   import ExUnit.CaptureIO
 
+  # Setup the database before running the tests
+
   setup do
     file_path = "test_db_state_#{:os.system_time(:millisecond)}.bin"
 
@@ -27,6 +29,7 @@ defmodule ElixKey.CLITest do
 
 
   # Test from https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md examples
+  # These tests mimics cli interaction with the application
 
   test "command output" do
     assert capture_io(fn -> ElixKey.loop() end) =~ ">"

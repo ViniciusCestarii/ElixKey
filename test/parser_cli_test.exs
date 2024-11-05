@@ -1,12 +1,7 @@
-defmodule ElixKey.Parser_Test do
+defmodule ElixKey.ParserTest do
   use ExUnit.Case
 
-  test "can't SET value with numeric key" do
-    assert ElixKey.Parser.parse_command("SET 1 teste") ==
-             {:error, :syntax_error, "Numeric keys are not allowed"}
-  end
-
-  test "can't SET numeric value on key" do
+  test "can't SET numeric key" do
     assert ElixKey.Parser.parse_command("SET 12 teste") ==
              {:error, :syntax_error, "Numeric keys are not allowed"}
   end

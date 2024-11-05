@@ -1,4 +1,4 @@
-defmodule ElixKey.TransactionsDB_Test do
+defmodule ElixKey.TransactionsDBTest do
   use ExUnit.Case
 
   setup do
