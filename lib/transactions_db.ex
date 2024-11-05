@@ -15,9 +15,7 @@ defmodule ElixKey.TransactionsDB do
 
   def set(key, value) do
     Agent.update(__MODULE__, fn state ->
-      new_state = update_state(state, key, value)
-      ElixKey.PersistentDB.save_state(new_state)
-      new_state
+      update_state(state, key, value)
     end)
   end
 
@@ -66,9 +64,7 @@ defmodule ElixKey.TransactionsDB do
 
     if willDelete do
       Agent.update(__MODULE__, fn state ->
-        new_state = update_state(state, key, :deleted)
-        ElixKey.PersistentDB.save_state(new_state)
-        new_state
+        update_state(state, key, :deleted)
       end)
     end
 
@@ -87,7 +83,6 @@ defmodule ElixKey.TransactionsDB do
         [current_tx | [previous_tx | rest]] ->
           merged_tx = merge_tx(previous_tx, current_tx)
           new_state = %{state | txs: [merged_tx | rest]}
-          ElixKey.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [current_tx] ->
@@ -107,7 +102,6 @@ defmodule ElixKey.TransactionsDB do
       case state.txs do
         [_ | rest] ->
           new_state = %{state | txs: rest}
-          ElixKey.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->
@@ -122,11 +116,15 @@ defmodule ElixKey.TransactionsDB do
         case value do
           :deleted ->
             new_db = Map.delete(state.db, key)
-            %{state | db: new_db}
+            new_state = %{state | db: new_db}
+            ElixKey.PersistentDB.save_state(new_state)
+            new_state
 
           _ ->
             new_db = Map.put(state.db, key, value)
-            %{state | db: new_db}
+            new_state = %{state | db: new_db}
+            ElixKey.PersistentDB.save_state(new_state)
+            new_state
         end
       [current_tx | rest] ->
         new_tx = Map.put(current_tx, key, value)
