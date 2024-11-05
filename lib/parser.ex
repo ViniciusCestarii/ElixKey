@@ -1,4 +1,4 @@
-defmodule DesafioCli.Parser do
+defmodule ElixKey.Parser do
   def parse_command(command) do
     case split_command(command) do
       ["SET", key, value] ->

@@ -1,4 +1,4 @@
-defmodule DesafioCli do
+defmodule ElixKey do
   def main(_args) do
     start_db()
     loop()
@@ -6,7 +6,7 @@ defmodule DesafioCli do
 
   @db_file_path "db_state.bin"
   defp start_db() do
-    {:ok, _} = DesafioCli.TransactionsDB.start_link(@db_file_path)
+    {:ok, _} = ElixKey.TransactionsDB.start_link(@db_file_path)
   end
 
   def loop() do
@@ -21,7 +21,7 @@ defmodule DesafioCli do
       _ ->
         command = command |> String.trim()
 
-        case DesafioCli.Parser.parse_command(command) do
+        case ElixKey.Parser.parse_command(command) do
           {:ok, :set, key, value} ->
             handle_set(key, value)
 
@@ -60,8 +60,8 @@ defmodule DesafioCli do
   end
 
   defp handle_set(key, value_data) do
-    old_value = DesafioCli.TransactionsDB.get(key)
-    DesafioCli.TransactionsDB.set(key, DesafioCli.Transformer.to_model_value(value_data))
+    old_value = ElixKey.TransactionsDB.get(key)
+    ElixKey.TransactionsDB.set(key, ElixKey.Transformer.to_model_value(value_data))
 
     case old_value do
       nil -> IO.puts("FALSE #{value_data.value}")
@@ -70,12 +70,12 @@ defmodule DesafioCli do
   end
 
   defp handle_get(key) do
-    case DesafioCli.TransactionsDB.get(key) do
+    case ElixKey.TransactionsDB.get(key) do
       nil ->
         IO.puts("NIL")
 
       db_value ->
-        case DesafioCli.Parser.parse_value(db_value) do
+        case ElixKey.Parser.parse_value(db_value) do
           {:ok, value_data} -> IO.puts(value_data.value)
           {:error, message} -> handle_error(message)
         end
@@ -83,33 +83,33 @@ defmodule DesafioCli do
   end
 
   defp handle_exists(key) do
-    case DesafioCli.TransactionsDB.exists?(key) do
+    case ElixKey.TransactionsDB.exists?(key) do
       true -> IO.puts("TRUE")
       false -> IO.puts("FALSE")
     end
   end
 
   defp handle_delete(key) do
-    case DesafioCli.TransactionsDB.delete?(key) do
+    case ElixKey.TransactionsDB.delete?(key) do
       true -> IO.puts("TRUE")
       false -> IO.puts("FALSE")
     end
   end
 
   defp handle_begin() do
-    DesafioCli.TransactionsDB.begin()
+    ElixKey.TransactionsDB.begin()
     print_transaction_stack_length()
   end
 
   defp handle_commit() do
-    case DesafioCli.TransactionsDB.commit() do
+    case ElixKey.TransactionsDB.commit() do
       {:ok} -> print_transaction_stack_length()
       {:error, :no_transaction_to_commit} -> handle_error("No transaction to commit")
     end
   end
 
   defp handle_rollback() do
-    case DesafioCli.TransactionsDB.rollback() do
+    case ElixKey.TransactionsDB.rollback() do
       {:ok} -> print_transaction_stack_length()
       {:error, :no_transaction_to_rollback} -> handle_error("No transaction to rollback")
     end
@@ -120,7 +120,7 @@ defmodule DesafioCli do
   end
 
   defp print_transaction_stack_length() do
-    nesting_level = DesafioCli.TransactionsDB.get_transaction_stack_length()
+    nesting_level = ElixKey.TransactionsDB.get_transaction_stack_length()
     IO.puts(nesting_level)
   end
 end

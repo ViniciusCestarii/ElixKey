@@ -27,5 +27,6 @@ desafio_cli-*.tar
 
 *.bin
 
-# binary
+# executable
 desafio_cli
+elix_key

@@ -1,4 +1,4 @@
-defmodule DesafioCli.TransactionsDB do
+defmodule ElixKey.TransactionsDB do
   @moduledoc """
   Um banco de dados chave-valor com suporte a transações recursivas e persistência em arquivo.
   """
@@ -6,8 +6,8 @@ defmodule DesafioCli.TransactionsDB do
   def start_link(db_file_path) do
     Agent.start_link(
       fn ->
-        DesafioCli.PersistentDB.start_link(db_file_path)
-        DesafioCli.PersistentDB.load_state()
+        ElixKey.PersistentDB.start_link(db_file_path)
+        ElixKey.PersistentDB.load_state()
       end,
       name: __MODULE__
     )
@@ -16,7 +16,7 @@ defmodule DesafioCli.TransactionsDB do
   def set(key, value) do
     Agent.update(__MODULE__, fn state ->
       new_state = update_state(state, key, value)
-      DesafioCli.PersistentDB.save_state(new_state)
+      ElixKey.PersistentDB.save_state(new_state)
       new_state
     end)
   end
@@ -67,7 +67,7 @@ defmodule DesafioCli.TransactionsDB do
     if willDelete do
       Agent.update(__MODULE__, fn state ->
         new_state = update_state(state, key, :deleted)
-        DesafioCli.PersistentDB.save_state(new_state)
+        ElixKey.PersistentDB.save_state(new_state)
         new_state
       end)
     end
@@ -87,13 +87,13 @@ defmodule DesafioCli.TransactionsDB do
         [current_tx | [previous_tx | rest]] ->
           merged_tx = merge_tx(previous_tx, current_tx)
           new_state = %{state | txs: [merged_tx | rest]}
-          DesafioCli.PersistentDB.save_state(new_state)
+          ElixKey.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [current_tx] ->
           new_db = merge_tx(state.db, current_tx)
           new_state = %{state | db: new_db, txs: []}
-          DesafioCli.PersistentDB.save_state(new_state)
+          ElixKey.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->
@@ -107,7 +107,7 @@ defmodule DesafioCli.TransactionsDB do
       case state.txs do
         [_ | rest] ->
           new_state = %{state | txs: rest}
-          DesafioCli.PersistentDB.save_state(new_state)
+          ElixKey.PersistentDB.save_state(new_state)
           {{:ok}, new_state}
 
         [] ->

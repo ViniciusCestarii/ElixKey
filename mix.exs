@@ -1,12 +1,12 @@
-defmodule DesafioCli.MixProject do
+defmodule ElixKey.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :desafio_cli,      
+      app: :elix_key,
       version: "0.1.0",
       elixir: "~> 1.16",
-      escript: [main_module: DesafioCli],
+      escript: [main_module: ElixKey],
       deps: deps()
     ]
   end

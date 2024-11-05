@@ -78,13 +78,13 @@ Executando o binário, sua CLI será executada.
 Executando binário no Linux:
 
 ```bash
-./desafio_cli
+./elix_key
 ```
 
 Executando binário no Windows:
 
 ```bash
-escript desafio_cli
+escript elix_key
 ```
 
 
@@ -93,24 +93,24 @@ escript desafio_cli
 Build the image:
 
 ```bash
-docker build -t elixir-cli-desafio .
+docker build -t elix_key .
 ```
 
 Run the container:
 
 ```bash
-docker run -it --rm elixir-cli-desafio
+docker run -it --rm elix_key
 ```
 
 ## Running tests with Docker
 Build the image:
 
 ```bash
-docker build -t elixir-cli-desafio .
+docker build -t elix_key .
 ```
 
 Run the tests:
 
 ```bash
-docker run --rm elixir-cli-desafio mix test
+docker run --rm elix_key mix test
 ```

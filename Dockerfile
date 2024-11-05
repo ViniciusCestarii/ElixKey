@@ -21,4 +21,4 @@ COPY . .
 RUN mix escript.build
 
 # Set the default command to run your app
-CMD ["./desafio_cli"]
+CMD ["./elix_key"]

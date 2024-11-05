@@ -1,11 +1,11 @@
-defmodule DesafioCli.CLITest do
+defmodule ElixKey.CLITest do
   use ExUnit.Case
   import ExUnit.CaptureIO
 
   setup do
     file_path = "test_db_state_#{:os.system_time(:millisecond)}.bin"
 
-    {:ok, _} = DesafioCli.TransactionsDB.start_link(file_path)
+    {:ok, _} = ElixKey.TransactionsDB.start_link(file_path)
 
     on_exit(fn ->
       File.rm(file_path)
@@ -29,21 +29,21 @@ defmodule DesafioCli.CLITest do
   # Test from https://github.com/appcumbuca/desafios/blob/master/desafio-back-end-pleno.md examples
 
   test "command output" do
-    assert capture_io(fn -> DesafioCli.loop() end) =~ ">"
+    assert capture_io(fn -> ElixKey.loop() end) =~ ">"
   end >
     TRY
 
   test(
     "Caso se tente invocar um comando que não seja um dos abaixo, deve ser emitido um erro apropriadamente"
   ) do
-    output = capture_io([input: "TRY", capture_prompt: false], fn -> DesafioCli.loop() end)
+    output = capture_io([input: "TRY", capture_prompt: false], fn -> ElixKey.loop() end)
     assert extract_relevant_output(output) == "> ERR \"No command TRY\"\n"
   end
 
   test "um comando seja chamado com sintaxe incorreta, deve também ser emitido um erro" do
     output =
       capture_io([input: "SET x", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> ERR \"SET <chave> <valor> - Syntax error\"\n"
@@ -55,7 +55,7 @@ defmodule DesafioCli.CLITest do
   test "SET" do
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -63,7 +63,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 2", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE 2\n"
@@ -75,7 +75,7 @@ defmodule DesafioCli.CLITest do
   test "GET" do
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> NIL\n"
@@ -83,7 +83,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -91,7 +91,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -103,7 +103,7 @@ defmodule DesafioCli.CLITest do
   test "BEGIN" do
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -111,7 +111,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -120,7 +120,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -131,7 +131,7 @@ defmodule DesafioCli.CLITest do
   test "BEGIN recursive transaction" do
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -139,7 +139,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 2\n"
@@ -151,37 +151,37 @@ defmodule DesafioCli.CLITest do
 
   test "ROLLBACK" do
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 0\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
@@ -189,81 +189,81 @@ defmodule DesafioCli.CLITest do
 
   test "ROLLBACK recursive transactions" do
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 2\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET foo bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET foo bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE bar\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET bar baz", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET bar baz", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE baz\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET foo", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> bar\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> baz\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET foo", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
 
@@ -276,37 +276,37 @@ defmodule DesafioCli.CLITest do
 
   test "COMMIT" do
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "COMMIT", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "COMMIT", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 0\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
@@ -314,108 +314,108 @@ defmodule DesafioCli.CLITest do
 
   test "COMMIT recursive transactions" do
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET teste 1", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET teste 1", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "BEGIN", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "BEGIN", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 2\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET foo bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET foo bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE bar\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "SET bar baz", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "SET bar baz", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> FALSE baz\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET foo", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> bar\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> baz\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "COMMIT", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "COMMIT", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET foo", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> bar\n"
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> baz\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 1\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "ROLLBACK", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> 0\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET teste", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET teste", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET foo", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET foo", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
 
     assert extract_relevant_output(output) == expected_output
 
     output =
-      capture_io([input: "GET bar", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "GET bar", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> NIL\n"
 
@@ -427,7 +427,7 @@ defmodule DesafioCli.CLITest do
   test "SET string" do
     output =
       capture_io([input: "SET teste abcd", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE abcd\n"
@@ -436,7 +436,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> abcd\n"
@@ -445,7 +445,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste a10", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE a10\n"
@@ -454,7 +454,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> a10\n"
@@ -463,7 +463,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste \"uma string com espaços\"", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE uma string com espaços\n"
@@ -471,7 +471,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> uma string com espaços\n"
@@ -480,7 +480,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste \"\"teste\"\"", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE \"teste\"\n"
@@ -489,7 +489,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> \"teste\"\n"
@@ -498,7 +498,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste \"101\"", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE 101\n"
@@ -507,7 +507,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 101\n"
@@ -516,7 +516,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste \"TRUE\"", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE TRUE\n"
@@ -529,7 +529,7 @@ defmodule DesafioCli.CLITest do
   test "SET NIL" do
     output =
       capture_io([input: "SET teste NIL", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> ERR \"NIL is not a valid value - use DELETE <chave> instead - Syntax error\"\n"
@@ -538,7 +538,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> NIL\n"
@@ -548,7 +548,7 @@ defmodule DesafioCli.CLITest do
     # NIL as a string can be inserted
     output =
       capture_io([input: "SET teste \"NIL\"", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE NIL\n"
@@ -557,7 +557,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "GET teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> NIL\n"
@@ -569,7 +569,7 @@ defmodule DesafioCli.CLITest do
 
   test "EXIT" do
     output =
-      capture_io([input: "EXIT", capture_prompt: false], fn -> DesafioCli.loop() end)
+      capture_io([input: "EXIT", capture_prompt: false], fn -> ElixKey.loop() end)
 
     expected_output = "> Exiting...\n"
 
@@ -579,7 +579,7 @@ defmodule DesafioCli.CLITest do
   test "EXISTS" do
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -588,7 +588,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -597,7 +597,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -608,7 +608,7 @@ defmodule DesafioCli.CLITest do
   test "EXISTS recursive transactions" do
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -617,7 +617,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -626,7 +626,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -635,7 +635,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -644,7 +644,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 2\n"
@@ -653,7 +653,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET foo bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE bar\n"
@@ -662,7 +662,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET bar baz", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE baz\n"
@@ -671,7 +671,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -680,7 +680,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -689,7 +689,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -698,7 +698,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -707,7 +707,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -716,7 +716,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -725,7 +725,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 0\n"
@@ -734,7 +734,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -743,7 +743,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -752,7 +752,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "EXISTS bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -763,7 +763,7 @@ defmodule DesafioCli.CLITest do
   test "DELETE" do
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -772,7 +772,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste 1", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE 1\n"
@@ -781,7 +781,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -790,7 +790,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -801,7 +801,7 @@ defmodule DesafioCli.CLITest do
   test "DELETE recursive transactions" do
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -810,7 +810,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET teste ola", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE ola\n"
@@ -819,7 +819,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -828,7 +828,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -837,7 +837,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -846,7 +846,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "BEGIN", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 2\n"
@@ -855,7 +855,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET foo bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE bar\n"
@@ -864,7 +864,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "SET bar baz", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE baz\n"
@@ -873,7 +873,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -882,7 +882,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -891,7 +891,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -900,7 +900,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -909,7 +909,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "COMMIT", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 1\n"
@@ -918,7 +918,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -927,7 +927,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -936,7 +936,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "ROLLBACK", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> 0\n"
@@ -945,7 +945,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> TRUE\n"
@@ -954,7 +954,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -963,7 +963,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE foo", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -972,7 +972,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE bar", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
@@ -981,7 +981,7 @@ defmodule DesafioCli.CLITest do
 
     output =
       capture_io([input: "DELETE teste", capture_prompt: false], fn ->
-        DesafioCli.loop()
+        ElixKey.loop()
       end)
 
     expected_output = "> FALSE\n"
