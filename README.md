@@ -1,4 +1,4 @@
-# ElixKey: Cumbuca desafio Elixir CLI
+# ElixKey: Cumbuca desafio Elixir DB e CLI
 
 [![Build Status](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml/badge.svg)](https://github.com/ViniciusCestarii/cumbuca-desafio/actions/workflows/test.yml)
 
