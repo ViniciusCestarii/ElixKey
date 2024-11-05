@@ -26,3 +26,6 @@ desafio_cli-*.tar
 /tmp/
 
 *.bin
+
+# binary
+desafio_cli
